@@ -7,26 +7,29 @@ import os
 from api_keyz import api_key
 
 api_url = 'https://finnhub.io/api/v1/'
-symbols_dir = 'symbols_csv'
+symbols_root_dir = 'symbols'
 asset_types = ['crypto', 'forex']
 
 
-def exchangelists(type):
+def exchange_lists(type):
     response = requests.get(api_url + type + '/exchange?token=' + api_key)
     response_json = response.json()
     return response_json
 
 
-def csvdir(asset_type):
-    os.makedirs(os.path.join(symbols_dir, asset_type), exist_ok=True)
+def csv_dir(asset_type):
+    os.makedirs(os.path.join(symbols_root_dir, asset_type), exist_ok=True)
 
-def symbolscsv(type, exchange):
+
+def symbols_csv(type, exchange):
     response = requests.get(api_url + type + '/symbol?exchange=' + exchange + '&token=' + api_key)
     response_json = response.json()
     dataframe = pd.DataFrame(response_json)
-    pd.DataFrame(dataframe).to_csv(os.path.join(symbols_dir, asset_type, type + '_' + exchange + '_symbols.csv'))
+    pd.DataFrame(dataframe).to_csv(os.path.join(symbols_root_dir, asset_type, type + '_' + exchange + '.csv'))
+
 
 for asset_type in asset_types:
-    csvdir(asset_type)
-    for exchange in exchangelists(asset_type):
-        symbolscsv(asset_type, exchange)
+    csv_dir(asset_type)
+    for exchange in exchange_lists(asset_type):
+        symbols_csv(asset_type, exchange)
+
